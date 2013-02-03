@@ -88,6 +88,7 @@ class Evolver:
     self.runner = runner
     self.fitness = fitness
     self.pop = [constructor() for i in range(pop)]
+    self.constructor = constructor
 
   def step(self):
     temp_pop = []
@@ -114,7 +115,8 @@ class Evolver:
     keepers = [ind for (fit, ind) in temp_pop[:num_keepers]]
 
     self.pop = [keep for keep in keepers]
-    for i in range(num_new):
+    self.pop.append(self.constructor())
+    for i in range(num_new-1):
       keep = choice(keepers)
       act = choice([1,2])
       if (act == 1):
