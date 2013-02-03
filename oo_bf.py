@@ -9,7 +9,9 @@ class CompileError(Exception):
 		return repr(self.value)
 
 class BF_Machine(object):
-	def __init__(self, program):
+	def __init__(self, program, in_buffer=[]):
+		self.in_buffer = in_buffer
+
 		self.jump_stack = []
 
 		try:
@@ -94,10 +96,10 @@ class BF_Machine(object):
 		if not self.cur_cell.value == 0:
 			self.cur_instruction = self.cur_instruction.loop
 	def input(self):
-		input = 0
-		while not input:
-			input = sys.stdin.read(1)
-		self.cur_cell.value = ord(input)
+		if self.in_buffer == []:
+			return 0
+		res = self.in_buffer.pop()
+		return res
 
 class BF_Instruction(object):
 	def __init__(self, machine, char, next_instruction, loop):
@@ -133,11 +135,11 @@ class BF_Cell(object):
 		self.prev = prev
 		self.value = value
 
-def run(prog_string):
+def run(prog_string, in_buf=[]):
 	program = re.findall(r"[<>+-\.\[\]]", prog_string)
 
 	try:
-		machine = BF_Machine(program)
+		machine = BF_Machine(program, [i for i in in_buf])
 	except CompileError:
 		print 'Compile Error'
 		sys.exit()

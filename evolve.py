@@ -6,7 +6,7 @@ from bisect import insort
 
 import oo_bf
 
-prog_chars = list("<>+-[].")
+prog_chars = list("<>+-[].,")
 
 def choose_with_weight(choices):
   total = sum([weight for (weight, item) in choices])
@@ -84,7 +84,8 @@ class Balanced_Looping_Program(BF_Program):
 
 
 class Evolver:
-  def __init__(self, fitness, pop, constructor):
+  def __init__(self, runner, fitness, pop, constructor):
+    self.runner = runner
     self.fitness = fitness
     self.pop = [constructor() for i in range(pop)]
 
@@ -93,7 +94,7 @@ class Evolver:
 
     for ind in self.pop:
       try:
-        out = oo_bf.run(ind.get_program())
+        out = self.runner(ind.get_program())
         fit = self.fitness(out)
         print fit, out
       except KeyboardInterrupt as ki:
@@ -129,8 +130,10 @@ class Evolver:
     return best_fit
 
 if __name__ == '__main__':
-  target = list("hello world!")
-  evolver = Evolver(lambda x : sum([abs(ord(o)-ord(e)) for (o,e) in zip(x[:len(target)], target)]) if len(x) >= len(target) and len(x) <= len(target)+20 else 10000*abs(len(x)-len(target)), 20, lambda: Balanced_Looping_Program(20))
+  inputs = [list("test"), list("hi!")]
+  targets = [list("test"), list("hi!")]
+  fitness = lambda (tar, out): sum([abs(ord(o)-ord(e)) for (o,e) in zip(out[:len(tar)], tar)]) if len(out) >= len(tar) and len(out) <= len(tar)+50 else 10000*abs(len(out)-len(tar))
+  evolver = Evolver(lambda prog: [oo_bf.run(prog, inp) for inp in inputs], lambda outs: sum([fitness(i) for i in zip(targets, outs)]), 20, lambda: Balanced_Looping_Program(20))
 
   generation = 0
   fit = 1000000
