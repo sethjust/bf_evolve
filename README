@@ -1,0 +1,6 @@
+bf_evolve
+
+Genetic algorithm for brainf**k programs.
+
+To run:
+  $ make
