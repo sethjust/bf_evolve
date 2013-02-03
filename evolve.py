@@ -1,11 +1,24 @@
 #!/usr/bin/env python
 
+import random
 from random import choice
 from bisect import insort
 
 import oo_bf
 
 prog_chars = list("<>+-[].")
+
+def choose_with_weight(choices):
+  total = sum([weight for (weight, item) in choices])
+  choices = [(weight/total, item) for (weight, item) in choices]
+
+  r = random.random()
+  total = 0
+  for (prob, item) in choices:
+    total += prob
+    if total > r:
+      return item
+  raise ValueError
 
 class BF_Program:
   def __init__(self, length):
@@ -54,11 +67,26 @@ class BF_Program:
 
     return new.mutate(1)
 
+class Balanced_Looping_Program(BF_Program):
+  def __init__(self, length):
+    self.program = ""
+    num_open = 0
+    for i in range(length):
+      p = self.prob_close(num_open, length-i)
+      c = choose_with_weight([(1-p,choice(prog_chars)), (p,']')])
+      self.program += c
+      if c == '[': num_open += 1
+
+  def prob_close(self, num_open, l):
+    if num_open >= l:
+      return 1
+    return num_open/float(l)
+
 
 class Evolver:
-  def __init__(self, fitness, pop, prog_len):
+  def __init__(self, fitness, pop, constructor):
     self.fitness = fitness
-    self.pop = [BF_Program(prog_len) for i in range(pop)]
+    self.pop = [constructor() for i in range(pop)]
 
   def step(self):
     temp_pop = []
@@ -102,7 +130,7 @@ class Evolver:
 
 if __name__ == '__main__':
   target = list("hello world!")
-  evolver = Evolver(lambda x : sum([abs(ord(o)-ord(e)) for (o,e) in zip(x, target)]) if len(x) == len(target) else 10000*abs(len(x)-len(target)), 20, 20)
+  evolver = Evolver(lambda x : sum([abs(ord(o)-ord(e)) for (o,e) in zip(x[:len(target)], target)]) if len(x) >= len(target) and len(x) <= len(target)+20 else 10000*abs(len(x)-len(target)), 20, lambda: Balanced_Looping_Program(20))
 
   generation = 0
   fit = 1000000

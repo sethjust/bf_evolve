@@ -52,23 +52,23 @@ class BF_Machine(object):
 			if char == ']':
 				self.jump_stack.append(instruction)
 			if char == '[':
-				if self.jump_stack == []:
-					raise CompileError
+#				if self.jump_stack == []:
+#					raise CompileError
 				loop = self.jump_stack.pop()
 
 			if not loop == None:
 				instruction.loop = loop
 				loop.loop = instruction
 			
-		if not self.jump_stack == []:
-			raise CompileError
+#		if not self.jump_stack == []:
+#			raise CompileError
 		return instruction
 	def run(self, max_steps=10000):
 		self.cur_instruction = self.first_instruction
 		steps = 0
 		while True:
 			steps = steps + 1
-			if steps > max_steps: raise Exception
+			if steps > max_steps: return self.output
 			self.cur_instruction.run()
 			self.prev_instruction = self.cur_instruction
 			self.cur_instruction = self.cur_instruction.next_instruction
