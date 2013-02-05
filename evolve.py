@@ -134,8 +134,8 @@ class Evolver:
 if __name__ == '__main__':
   inputs = [list("test"), list("hi!")]
   targets = [list("test"), list("hi!")]
-  fitness = lambda (tar, out): sum([abs(ord(o)-ord(e)) for (o,e) in zip(out[:len(tar)], tar)]) if len(out) >= len(tar) and len(out) <= len(tar)+50 else 10000*abs(len(out)-len(tar))
-  evolver = Evolver(lambda prog: [oo_bf.run(prog, inp) for inp in inputs], lambda outs: sum([fitness(i) for i in zip(targets, outs)]), 20, lambda: Balanced_Looping_Program(20))
+  fitness = lambda (tar, out): sum([abs(ord(o)-ord(e)) for (o,e) in zip(out[-len(tar):], tar)]) if len(out) >= len(tar) else 10000*abs(len(out)-len(tar))
+  evolver = Evolver(lambda prog: [oo_bf.run(prog, inp) for inp in inputs], lambda outs: sum([fitness(i) for i in zip(targets, outs)]), 50, lambda: Balanced_Looping_Program(20))
 
   generation = 0
   fit = 1000000
